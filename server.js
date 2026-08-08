@@ -93,15 +93,12 @@ app.get("/api/weather", async (req, res) => {
 
 
   } catch (error) {
+  console.error("WEATHER ERROR:", error.response?.data || error.message);
 
-    console.error(error);
-
-    res.status(500).json({
-      error: "Something went wrong"
-    });
-
-  }
-
+  res.status(500).json({
+    error: error.response?.data?.reason || error.message || "Something went wrong"
+  });
+}
 });
 
 
