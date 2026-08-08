@@ -167,108 +167,101 @@ async function searchWeather() {
     }
 
 
-    const weatherInfo =
-      getWeatherInfo(
-        data.weatherCode
-      );
-
-
     // Display weather
-    weatherResult.innerHTML = `
+weatherResult.innerHTML = `
 
-      <div class="weather-card">
+  <div class="weather-card">
 
-        <div class="weather-main">
+    <div class="weather-main">
 
-          <div>
+      <div>
 
-            <p class="app-label">
-              Current Weather
-            </p>
+        <p class="app-label">
+          Current Weather
+        </p>
 
-            <h2 class="location">
-              ${data.city}, ${data.country}
-            </h2>
+        <h2 class="location">
+          ${data.city}, ${data.country}
+        </h2>
 
-            <p class="weather-description">
-              ${weatherInfo.description}
-            </p>
+        <p class="weather-description">
+          ${data.weatherDescription}
+        </p>
 
-          </div>
+      </div>
 
 
-          <div class="temperature-area">
+      <div class="temperature-area">
 
-            <div class="weather-icon">
-              ${weatherInfo.icon}
-            </div>
-
-            <div class="temperature">
-              ${Math.round(data.temperature)}°
-            </div>
-
-          </div>
-
+        <div class="weather-icon">
+          🌤️
         </div>
 
-
-        <div class="weather-details">
-
-          <div class="detail-card">
-
-            <div class="detail-icon">
-              🌡️
-            </div>
-
-            <p class="detail-label">
-              Feels Like
-            </p>
-
-            <p class="detail-value">
-              ${Math.round(data.feelsLike)} °C
-            </p>
-
-          </div>
-
-
-          <div class="detail-card">
-
-            <div class="detail-icon">
-              💧
-            </div>
-
-            <p class="detail-label">
-              Humidity
-            </p>
-
-            <p class="detail-value">
-              ${data.humidity}%
-            </p>
-
-          </div>
-
-
-          <div class="detail-card">
-
-            <div class="detail-icon">
-              💨
-            </div>
-
-            <p class="detail-label">
-              Wind Speed
-            </p>
-
-            <p class="detail-value">
-              ${data.windSpeed} km/h
-            </p>
-
-          </div>
-
+        <div class="temperature">
+          ${Math.round(data.temperature)}°
         </div>
 
       </div>
 
-    `;
+    </div>
+
+
+    <div class="weather-details">
+
+      <div class="detail-card">
+
+        <div class="detail-icon">
+          🌡️
+        </div>
+
+        <p class="detail-label">
+          Feels Like
+        </p>
+
+        <p class="detail-value">
+          ${Math.round(data.feelsLike)} °C
+        </p>
+
+      </div>
+
+
+      <div class="detail-card">
+
+        <div class="detail-icon">
+          💧
+        </div>
+
+        <p class="detail-label">
+          Humidity
+        </p>
+
+        <p class="detail-value">
+          ${data.humidity}%
+        </p>
+
+      </div>
+
+
+      <div class="detail-card">
+
+        <div class="detail-icon">
+          💨
+        </div>
+
+        <p class="detail-label">
+          Wind Speed
+        </p>
+
+        <p class="detail-value">
+          ${data.windSpeed} km/h
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+`;
 
 
   } catch (error) {

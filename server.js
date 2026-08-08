@@ -7,7 +7,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 
-// Serve static files from the public folder
+// Serve static files
 app.use(express.static(path.join(__dirname, "public")));
 
 
@@ -19,11 +19,8 @@ app.get("/", (req, res) => {
 
 // Weather API route
 app.get("/api/weather", async (req, res) => {
-
-  // Get city from query parameter
   const city = req.query.city;
 
-  // Check if city was provided
   if (!city) {
     return res.status(400).json({
       error: "City is required"
@@ -32,77 +29,92 @@ app.get("/api/weather", async (req, res) => {
 
   try {
 
-    // STEP 1: Find the city coordinates
-    const cityResponse = await axios.get(
-      "https://geocoding-api.open-meteo.com/v1/search",
+    // Request weather data from wttr.in
+    const response = await axios.get(
+      `https://wttr.in/${encodeURIComponent(city)}?format=j1`,
       {
-        params: {
-          name: city,
-          count: 1,
-          language: "en",
-          format: "json"
+        headers: {
+          "User-Agent": "weather-app"
         }
       }
     );
 
 
-    // Check if city exists
-    if (!cityResponse.data.results) {
+    const data = response.data;
+
+
+    // Check if weather data exists
+    if (
+      !data.current_condition ||
+      data.current_condition.length === 0
+    ) {
       return res.status(404).json({
         error: "City not found"
       });
     }
 
 
-    // Get the first city result
-    const location = cityResponse.data.results[0];
+    const current = data.current_condition[0];
 
-    const latitude = location.latitude;
-    const longitude = location.longitude;
-
-
-    // STEP 2: Get current weather using coordinates
-    const weatherResponse = await axios.get(
-      "https://api.open-meteo.com/v1/forecast",
-      {
-        params: {
-          latitude: latitude,
-          longitude: longitude,
-          current:
-            "temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m",
-          timezone: "auto"
-        }
-      }
-    );
+    const nearestArea =
+      data.nearest_area &&
+      data.nearest_area[0];
 
 
-    // Current weather data
-    const weather = weatherResponse.data.current;
+    // City name
+    const cityName =
+      nearestArea?.areaName?.[0]?.value || city;
 
 
-    // STEP 3: Send weather data to the frontend
+    // Country name
+    const country =
+      nearestArea?.country?.[0]?.value || "";
+
+
+    // Send only the data our frontend needs
     res.json({
-      city: location.name,
-      country: location.country,
-      temperature: weather.temperature_2m,
-      feelsLike: weather.apparent_temperature,
-      humidity: weather.relative_humidity_2m,
-      windSpeed: weather.wind_speed_10m,
-      weatherCode: weather.weather_code
+      city: cityName,
+      country: country,
+
+      temperature:
+        Number(current.temp_C),
+
+      feelsLike:
+        Number(current.FeelsLikeC),
+
+      humidity:
+        Number(current.humidity),
+
+      windSpeed:
+        Number(current.windspeedKmph),
+
+      weatherDescription:
+        current.weatherDesc?.[0]?.value || "Unknown",
+
+      weatherCode:
+        Number(current.weatherCode)
     });
 
 
   } catch (error) {
-  console.error("WEATHER ERROR:", error.response?.data || error.message);
 
-  res.status(500).json({
-    error: error.response?.data?.reason || error.message || "Something went wrong"
-  });
-}
+    console.error(
+      "WEATHER ERROR:",
+      error.response?.data || error.message
+    );
+
+
+    res.status(500).json({
+      error: "Unable to get weather data"
+    });
+
+  }
 });
 
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(
+    `Server is running on http://localhost:${PORT}`
+  );
 });
